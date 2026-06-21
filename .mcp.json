@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "x-search-codex": {
+      "command": "python3",
+      "args": [
+        "./scripts/x_search_mcp.py"
+      ],
+      "env": {}
+    }
+  }
+}

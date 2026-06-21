@@ -1,0 +1,37 @@
+{
+  "name": "x-search-codex",
+  "version": "0.1.0",
+  "description": "Codex plugin for read-only X/Twitter research through xAI Responses API x_search.",
+  "author": {
+    "name": "Logan Kang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "x",
+    "twitter",
+    "x-search",
+    "xai",
+    "grok",
+    "codex-plugin",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "X Search Codex",
+    "shortDescription": "Search X through xAI x_search without installing Hermes.",
+    "longDescription": "Adds local MCP tools for read-only X/Twitter research using xAI Responses API x_search. The plugin does not manage xAI OAuth; provide an xAI bearer token or API key through the local environment.",
+    "developerName": "Logan Kang",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Research"
+    ],
+    "defaultPrompt": [
+      "Search X for recent posts about OpenAI.",
+      "Find recent X reactions to this news.",
+      "Fetch this X post and summarize it."
+    ],
+    "brandColor": "#111111"
+  }
+}
