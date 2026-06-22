@@ -9,7 +9,7 @@ This is not a browser scraper. The plugin calls `https://api.x.ai/v1/responses`
 with xAI's server-side `x_search` tool and returns Grok's answer plus citations
 when xAI provides them.
 
-## Quickstart
+## Quickstart for Codex
 
 Prerequisites:
 
@@ -58,24 +58,55 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x_search",
 If Codex already had the MCP server running, open a new Codex thread or restart
 Codex so it starts the updated server process.
 
+## Quickstart for Claude Code
+
+Prerequisites:
+
+- uv
+- Claude Code with MCP support
+- An xAI account with SuperGrok / X Premium+ OAuth entitlement, or `XAI_API_KEY`
+- GitHub SSH access for the command below, or use the repository HTTPS URL
+
+Clone the repository:
+
+```bash
+git clone git@github.com:Ilevk/x-search-plugin.git
+cd x-search-plugin
+```
+
+Authenticate with xAI OAuth:
+
+```bash
+uv run --quiet --locked python scripts/x_search_auth.py login
+```
+
+Start Claude Code from the repository root:
+
+```bash
+claude
+```
+
+Approve the `x-search-plugin` MCP server if prompted, then check:
+
+```text
+/mcp
+```
+
+Manual Claude Code registration, if project `.mcp.json` is not picked up:
+
+```bash
+claude mcp add --transport stdio --scope project x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
+```
+
+In a full repository checkout, `CLAUDE.md` and `.claude/settings.json` provide
+Claude Code guidance and deny direct reads of local credential stores.
+
 ## Installation Options
 
 Option 1: direct MCP registration during local development:
 
 ```bash
 codex mcp add x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
-```
-
-Claude Code can use the checked-in project `.mcp.json` directly. Open Claude
-Code from the repository root, approve the `x-search-plugin` server if prompted,
-then check `/mcp`. In a full repository checkout, `CLAUDE.md` and
-`.claude/settings.json` provide Claude Code guidance and deny direct reads of
-local credential stores.
-
-Equivalent manual Claude Code registration:
-
-```bash
-claude mcp add --transport stdio --scope project x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 ```
 
 Option 2: marketplace-style plugin install from this repository:
