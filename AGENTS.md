@@ -6,9 +6,10 @@ This repository provides an MCP plugin for read-only X/Twitter research through
 xAI's Responses API `x_search` tool. Codex and Claude Code are the first
 supported client surfaces.
 
-The primary authentication path is xAI OAuth for SuperGrok / X Premium+
-accounts. `XAI_API_KEY` remains a fallback path. Do not redesign the project
-around browser scraping or X API v2 unless Logan explicitly changes the goal.
+The primary authentication path is xAI OAuth for entitled X Premium, Premium+,
+and SuperGrok accounts. `XAI_API_KEY` remains a fallback path. Do not redesign
+the project around browser scraping or X API v2 unless Logan explicitly changes
+the goal.
 
 ## Boundaries
 
@@ -70,8 +71,10 @@ When auth, setup, or failure behavior changes, update `README.md` and
 the relevant `docs/*.md` file in the same change. Keep
 `plugins/x-search-plugin/README.md` and `plugins/x-search-plugin/docs/` in sync
 with the root README/docs, and update `skills/x-search-plugin/SKILL.md` when
-agent-facing usage changes. Keep docs operational: commands should be
-copy-pasteable and troubleshooting should name the expected failure mode.
+agent-facing usage changes. `CLAUDE.md` must remain a symlink to `AGENTS.md` so
+Codex and Claude Code share one source of repository guidance. Keep docs
+operational: commands should be copy-pasteable and troubleshooting should name
+the expected failure mode.
 
 ## Plugin Packaging Status
 

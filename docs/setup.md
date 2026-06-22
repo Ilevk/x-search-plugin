@@ -10,7 +10,8 @@ plugin payload include `pyproject.toml` and `uv.lock`, and MCP startup uses
 - `uv`
 - GitHub SSH access, or use the repository HTTPS URL
 - Codex CLI or Claude Code with MCP support
-- An xAI account with SuperGrok / X Premium+ OAuth entitlement, or `XAI_API_KEY`
+- An xAI account with X Premium, Premium+, or SuperGrok OAuth entitlement, or
+  `XAI_API_KEY`
 
 ## Clone
 
@@ -52,11 +53,12 @@ plugin cache or `plugins/x-search-plugin/` payload directory.
 
 ## Claude Code Setup
 
-The repository includes `.mcp.json`, `CLAUDE.md`, and `.claude/settings.json`.
-Start Claude Code from the repository root:
+`CLAUDE.md` is a symlink to `AGENTS.md`, so Claude Code and Codex share the same
+repository guidance. Register the MCP server explicitly for Claude Code:
 
 ```bash
 uv run --quiet --locked python scripts/x_search_auth.py login
+claude mcp add --transport stdio --scope user x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 claude
 ```
 
@@ -64,12 +66,6 @@ Approve the `x-search-plugin` MCP server if prompted, then check:
 
 ```text
 /mcp
-```
-
-Manual Claude Code registration, if project `.mcp.json` is not picked up:
-
-```bash
-claude mcp add --transport stdio --scope project x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 ```
 
 ## API-Key Fallback

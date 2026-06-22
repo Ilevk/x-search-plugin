@@ -14,7 +14,7 @@ other X mutations. The plugin only supports read-only research.
 ## Preconditions
 
 The MCP server needs one usable xAI credential. Prefer local xAI OAuth for
-SuperGrok / X Premium+ accounts:
+entitled X Premium, Premium+, or SuperGrok accounts:
 
 ```bash
 uv run --quiet --locked python scripts/x_search_auth.py login

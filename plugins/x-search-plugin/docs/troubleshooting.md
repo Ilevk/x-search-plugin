@@ -20,8 +20,8 @@ server by opening a new thread or restarting Codex.
 ## OAuth Login Succeeds, but Search Returns `403`
 
 This is an xAI entitlement/API access issue, not a local token refresh problem.
-Your X Premium+ or SuperGrok account may not be allowed on this OAuth API
-surface.
+Your X Premium, Premium+, or SuperGrok account may not be allowed on this OAuth
+API surface.
 
 To use `XAI_API_KEY` as a fallback, remove or isolate the stored OAuth credential
 first, then restart the MCP process:

@@ -2,8 +2,8 @@
 
 MCP plugin for read-only X/Twitter research through xAI's Responses API
 `x_search` tool. It is packaged for Codex and Claude Code, supports xAI OAuth
-login for SuperGrok / X Premium+ accounts, and falls back to `XAI_API_KEY` when
-no usable stored OAuth credential is present.
+login for entitled X Premium, Premium+, and SuperGrok accounts, and falls back
+to `XAI_API_KEY` when no usable stored OAuth credential is present.
 
 This is not a browser scraper. The plugin calls `https://api.x.ai/v1/responses`
 with xAI's server-side `x_search` tool and returns Grok's answer plus citations
@@ -23,7 +23,7 @@ Steps:
 1. Clone or update the repository.
 2. Register the x-search-plugin MCP server for the current agent client.
    - Codex: use codex mcp add or the Codex plugin marketplace flow.
-   - Claude Code: use the repository .mcp.json, or claude mcp add --transport stdio --scope project if needed.
+   - Claude Code: use claude mcp add --transport stdio.
 3. Run uv run --quiet --locked python scripts/x_search_auth.py status.
 4. If no credential is configured, ask me to run uv run --quiet --locked python scripts/x_search_auth.py login locally.
 5. Run uv run --quiet --locked python scripts/smoke_mcp.py.
@@ -34,8 +34,8 @@ Keep this read-only. Do not post, like, follow, DM, or mutate any X account stat
 
 ## Quickstart for Codex
 
-Prerequisites: `uv`, Codex CLI with MCP support, and either an xAI OAuth-capable
-SuperGrok / X Premium+ account or `XAI_API_KEY`.
+Prerequisites: `uv`, Codex CLI with MCP support, and either an xAI OAuth-entitled
+X Premium, Premium+, or SuperGrok account, or `XAI_API_KEY`.
 
 ```bash
 git clone git@github.com:Ilevk/x-search-plugin.git
@@ -58,22 +58,21 @@ registration.
 
 ## Quickstart for Claude Code
 
-Prerequisites: `uv`, Claude Code with MCP support, and either an xAI OAuth-capable
-SuperGrok / X Premium+ account or `XAI_API_KEY`.
+Prerequisites: `uv`, Claude Code with MCP support, and either an xAI OAuth-entitled
+X Premium, Premium+, or SuperGrok account, or `XAI_API_KEY`.
 
 ```bash
 git clone git@github.com:Ilevk/x-search-plugin.git
 cd x-search-plugin
 uv run --quiet --locked python scripts/x_search_auth.py login
+claude mcp add --transport stdio --scope user x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 claude
 ```
 
 Approve the `x-search-plugin` MCP server if prompted, then check `/mcp`.
 
-Manual registration, if project `.mcp.json` is not picked up:
-
 ```bash
-claude mcp add --transport stdio --scope project x-search-plugin -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
+claude mcp list
 ```
 
 ## Documentation
