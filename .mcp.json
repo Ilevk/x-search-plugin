@@ -1,8 +1,12 @@
 {
   "mcpServers": {
     "x-search-codex": {
-      "command": "python3",
+      "command": "uv",
       "args": [
+        "run",
+        "--quiet",
+        "--locked",
+        "python",
         "./scripts/x_search_mcp.py"
       ],
       "env": {}

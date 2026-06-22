@@ -496,7 +496,7 @@ def refresh(*, force: bool = False) -> dict[str, Any]:
     state = _load_state()
     tokens = state.get("tokens") if isinstance(state, dict) else None
     if not isinstance(tokens, dict):
-        raise XAIAuthError("No xAI OAuth credentials stored. Run `python3 scripts/x_search_auth.py login`.")
+        raise XAIAuthError("No xAI OAuth credentials stored. Run `uv run --quiet --locked python scripts/x_search_auth.py login`.")
     access_token = str(tokens.get("access_token") or "").strip()
     refresh_token = str(tokens.get("refresh_token") or "").strip()
     if not refresh_token:
@@ -572,7 +572,7 @@ def resolve_credentials() -> dict[str, str]:
         if env:
             return env
         raise XAIAuthError(
-            "No xAI credential found. Run `python3 scripts/x_search_auth.py login` "
+            "No xAI credential found. Run `uv run --quiet --locked python scripts/x_search_auth.py login` "
             "for xAI OAuth, or set XAI_API_KEY."
         )
 

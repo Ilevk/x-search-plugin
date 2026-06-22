@@ -13,7 +13,7 @@ when xAI provides them.
 
 Prerequisites:
 
-- Python 3.9+
+- uv
 - Codex CLI with MCP support
 - An xAI account with SuperGrok / X Premium+ OAuth entitlement, or `XAI_API_KEY`
 - GitHub SSH access for the command below, or use the repository HTTPS URL
@@ -28,20 +28,20 @@ cd x-search-codex
 Register the MCP server with Codex:
 
 ```bash
-codex mcp add x-search-codex -- python3 "$PWD/scripts/x_search_mcp.py"
+codex mcp add x-search-codex -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 ```
 
 Authenticate with xAI OAuth:
 
 ```bash
-python3 scripts/x_search_auth.py login
+uv run --quiet --locked python scripts/x_search_auth.py login
 ```
 
 Verify protocol wiring:
 
 ```bash
-python3 scripts/x_search_auth.py status
-python3 scripts/smoke_mcp.py
+uv run --quiet --locked python scripts/x_search_auth.py status
+uv run --quiet --locked python scripts/smoke_mcp.py
 ```
 
 `smoke_mcp.py` intentionally isolates credentials and checks MCP protocol shape
@@ -52,7 +52,7 @@ Run a live search:
 
 ```bash
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x_search","arguments":{"query":"latest posts about xAI"}}}' \
-  | python3 scripts/x_search_mcp.py
+  | uv run --quiet --locked python scripts/x_search_mcp.py
 ```
 
 If Codex already had the MCP server running, open a new Codex thread or restart
@@ -63,7 +63,7 @@ Codex so it starts the updated server process.
 Option 1: direct MCP registration during local development:
 
 ```bash
-codex mcp add x-search-codex -- python3 "$PWD/scripts/x_search_mcp.py"
+codex mcp add x-search-codex -- uv run --quiet --locked python "$PWD/scripts/x_search_mcp.py"
 ```
 
 Option 2: marketplace-style plugin install from this repository:
@@ -84,6 +84,10 @@ The installable plugin payload lives under `plugins/x-search-codex/`. Keep it in
 sync with the root development files when changing scripts, MCP config, skills,
 or plugin metadata.
 
+The plugin is uv-first: `pyproject.toml` and `uv.lock` are included in both the
+root development checkout and the installable plugin payload. MCP startup uses
+`uv run --quiet --locked ...` so the runtime contract is explicit and lockfile-backed.
+
 ## What It Provides
 
 - `x_search`: flexible X research with citations when xAI returns them.
@@ -99,7 +103,7 @@ or plugin metadata.
 Preferred path, no API key:
 
 ```bash
-python3 scripts/x_search_auth.py login
+uv run --quiet --locked python scripts/x_search_auth.py login
 ```
 
 The login opens `accounts.x.ai` / `auth.x.ai`, stores tokens at
@@ -113,16 +117,16 @@ later returns `403` for a subscription tier or allowlist issue.
 Headless or remote shell:
 
 ```bash
-python3 scripts/x_search_auth.py login --no-browser
-python3 scripts/x_search_auth.py login --manual-paste
+uv run --quiet --locked python scripts/x_search_auth.py login --no-browser
+uv run --quiet --locked python scripts/x_search_auth.py login --manual-paste
 ```
 
 Status, refresh, and logout:
 
 ```bash
-python3 scripts/x_search_auth.py status
-python3 scripts/x_search_auth.py refresh
-python3 scripts/x_search_auth.py logout
+uv run --quiet --locked python scripts/x_search_auth.py status
+uv run --quiet --locked python scripts/x_search_auth.py refresh
+uv run --quiet --locked python scripts/x_search_auth.py logout
 ```
 
 Credential priority:
@@ -139,10 +143,10 @@ plugin does not automatically retry with `XAI_API_KEY`.
 API-key fallback for direct shell tests:
 
 ```bash
-python3 scripts/x_search_auth.py logout
+uv run --quiet --locked python scripts/x_search_auth.py logout
 export XAI_API_KEY="..."
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x_search","arguments":{"query":"latest posts about xAI"}}}' \
-  | python3 scripts/x_search_mcp.py
+  | uv run --quiet --locked python scripts/x_search_mcp.py
 ```
 
 For Codex App usage, set `XAI_API_KEY` before the MCP server starts, then open a
@@ -210,10 +214,10 @@ Search a date range:
 Run:
 
 ```bash
-python3 scripts/x_search_auth.py status
+uv run --quiet --locked python scripts/x_search_auth.py status
 ```
 
-If OAuth is not configured, run `python3 scripts/x_search_auth.py login`. If the
+If OAuth is not configured, run `uv run --quiet --locked python scripts/x_search_auth.py login`. If the
 CLI status is configured but Codex still says false, restart the Codex MCP
 server by opening a new thread or restarting Codex.
 
@@ -225,7 +229,7 @@ surface. To use `XAI_API_KEY` as a fallback, remove or isolate the stored OAuth
 credential first, then restart the MCP process:
 
 ```bash
-python3 scripts/x_search_auth.py logout
+uv run --quiet --locked python scripts/x_search_auth.py logout
 export XAI_API_KEY="..."
 ```
 
@@ -236,17 +240,17 @@ For Codex App, open a new thread or restart Codex after changing credentials.
 Run:
 
 ```bash
-python3 scripts/x_search_auth.py refresh
+uv run --quiet --locked python scripts/x_search_auth.py refresh
 ```
 
-If refresh fails, run `python3 scripts/x_search_auth.py login` again.
+If refresh fails, run `uv run --quiet --locked python scripts/x_search_auth.py login` again.
 
 ### Callback timeout
 
 Use manual paste mode:
 
 ```bash
-python3 scripts/x_search_auth.py login --manual-paste
+uv run --quiet --locked python scripts/x_search_auth.py login --manual-paste
 ```
 
 Approve in the browser, then paste the full callback URL or
@@ -264,7 +268,7 @@ verify with another source.
 
 - Do not paste OAuth codes, access tokens, refresh tokens, or API keys into chat.
 - OAuth state is stored at `~/.x-search-codex/auth.json` by default.
-- Use `python3 scripts/x_search_auth.py logout` to remove stored OAuth state.
+- Use `uv run --quiet --locked python scripts/x_search_auth.py logout` to remove stored OAuth state.
 - Do not set `XAI_BASE_URL` to an untrusted endpoint while using real OAuth or
   API-key credentials.
 - This plugin is read-only. It does not post, like, follow, DM, or mutate X
@@ -276,14 +280,14 @@ verify with another source.
 Protocol smoke test without network:
 
 ```bash
-python3 scripts/smoke_mcp.py
+uv run --quiet --locked python scripts/smoke_mcp.py
 ```
 
 Syntax check:
 
 ```bash
 env PYTHONPYCACHEPREFIX=/tmp/x-search-codex-pycache \
-  python3 -m py_compile scripts/xai_oauth.py scripts/x_search_auth.py scripts/x_search_mcp.py scripts/smoke_mcp.py
+  uv run --quiet --locked python -m py_compile scripts/xai_oauth.py scripts/x_search_auth.py scripts/x_search_mcp.py scripts/smoke_mcp.py
 ```
 
 The smoke test isolates credentials with a temporary `X_SEARCH_CODEX_HOME` and

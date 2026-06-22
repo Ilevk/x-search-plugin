@@ -212,7 +212,7 @@ def call_x_search(
     bearer, credential_source, base_url = _credential()
     if not bearer:
         raise XSearchError(
-            "No xAI credential found. Run `python3 scripts/x_search_auth.py login` "
+            "No xAI credential found. Run `uv run --quiet --locked python scripts/x_search_auth.py login` "
             "for xAI OAuth, or set XAI_API_KEY."
         )
 

@@ -1,0 +1,11 @@
+[project]
+name = "x-search-codex"
+version = "0.1.0"
+description = "Codex plugin for read-only X/Twitter research through xAI x_search."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+dependencies = []
+
+[tool.uv]
+package = false
