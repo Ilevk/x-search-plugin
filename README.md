@@ -208,7 +208,7 @@ After registering the MCP server and authenticating, start a new Codex thread.
 Ask for X-sourced research directly, for example:
 
 ```text
-Search X for recent posts from @xai and summarize the latest 5 with links.
+Search X for recent posts from @Lo_gan__ and summarize the latest 5 with links.
 ```
 
 If `x_search_status` in an existing thread still shows the old shape or
@@ -229,8 +229,8 @@ Search one account:
 
 ```json
 {
-  "query": "Find recent posts from @xai",
-  "allowed_x_handles": ["xai"]
+  "query": "Find recent posts from @Lo_gan__",
+  "allowed_x_handles": ["Lo_gan__"]
 }
 ```
 
