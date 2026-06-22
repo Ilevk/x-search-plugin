@@ -67,9 +67,11 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"x_search",
 ## Documentation Expectations
 
 When auth, setup, or failure behavior changes, update `README.md` and
-`skills/x-search-plugin/SKILL.md` in the same change. Keep docs operational:
-commands should be copy-pasteable and troubleshooting should name the expected
-failure mode.
+the relevant `docs/*.md` file in the same change. Keep
+`plugins/x-search-plugin/README.md` and `plugins/x-search-plugin/docs/` in sync
+with the root README/docs, and update `skills/x-search-plugin/SKILL.md` when
+agent-facing usage changes. Keep docs operational: commands should be
+copy-pasteable and troubleshooting should name the expected failure mode.
 
 ## Plugin Packaging Status
 
@@ -84,11 +86,12 @@ plugins/x-search-plugin/.codex-plugin/plugin.json
 plugins/x-search-plugin/.mcp.json
 plugins/x-search-plugin/skills/...
 plugins/x-search-plugin/scripts/...
+plugins/x-search-plugin/docs/...
 ```
 
 The root files are the development source of truth. The `plugins/x-search-plugin`
 payload must stay in sync when changing scripts, MCP config, skills, README,
-NOTICE, LICENSE, or plugin metadata. After packaging changes, verify with a
+docs, NOTICE, LICENSE, or plugin metadata. After packaging changes, verify with a
 local marketplace registration and `codex plugin add x-search-plugin@x-search-plugin`.
 
 ## Git Discipline
