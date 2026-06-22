@@ -1,7 +1,7 @@
 {
   "name": "x-search-codex",
   "version": "0.1.0",
-  "description": "Codex plugin for read-only X/Twitter research through xAI Responses API x_search.",
+  "description": "Codex plugin for read-only X/Twitter research through xAI Responses API x_search with xAI OAuth support.",
   "author": {
     "name": "Logan Kang"
   },
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "X Search Codex",
     "shortDescription": "Search X through xAI x_search without installing Hermes.",
-    "longDescription": "Adds local MCP tools for read-only X/Twitter research using xAI Responses API x_search. The plugin does not manage xAI OAuth; provide an xAI bearer token or API key through the local environment.",
+    "longDescription": "Adds local MCP tools for read-only X/Twitter research using xAI Responses API x_search. Supports local xAI OAuth login for SuperGrok / X Premium+ accounts and falls back to xAI bearer/API-key credentials.",
     "developerName": "Logan Kang",
     "category": "Productivity",
     "capabilities": [

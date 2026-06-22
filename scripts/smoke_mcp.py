@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -32,24 +34,36 @@ def main() -> int:
             "method": "tools/call",
             "params": {"name": "x_search_status", "arguments": {}},
         },
+        {
+            "jsonrpc": "2.0",
+            "id": 4,
+            "method": "tools/call",
+            "params": {"name": "x_search", "arguments": {"query": "latest posts about xAI"}},
+        },
     ]
     payload = "".join(json.dumps(message) + "\n" for message in messages)
-    result = subprocess.run(
-        [sys.executable, str(SERVER)],
-        input=payload,
-        text=True,
-        capture_output=True,
-        check=False,
-        cwd=ROOT,
-        timeout=10,
-    )
+    env = os.environ.copy()
+    for name in ("XAI_OAUTH_BEARER_TOKEN", "XAI_BEARER_TOKEN", "XAI_API_KEY"):
+        env.pop(name, None)
+    with tempfile.TemporaryDirectory(prefix="x-search-codex-smoke-") as auth_home:
+        env["X_SEARCH_CODEX_HOME"] = auth_home
+        result = subprocess.run(
+            [sys.executable, str(SERVER)],
+            input=payload,
+            text=True,
+            capture_output=True,
+            check=False,
+            cwd=ROOT,
+            env=env,
+            timeout=10,
+        )
     if result.returncode != 0:
         sys.stderr.write(result.stderr)
         return result.returncode
 
     responses = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
     ids = {response.get("id") for response in responses}
-    if ids != {1, 2, 3}:
+    if ids != {1, 2, 3, 4}:
         raise RuntimeError(f"unexpected response ids: {ids}")
     tools = responses[1]["result"]["tools"]
     tool_names = {tool["name"] for tool in tools}
@@ -57,6 +71,11 @@ def main() -> int:
     missing = expected - tool_names
     if missing:
         raise RuntimeError(f"missing tools: {sorted(missing)}")
+    if responses[3]["result"]["isError"] is not True:
+        raise RuntimeError("x_search should fail without credentials")
+    error_text = responses[3]["result"]["content"][0]["text"]
+    if "x_search_auth.py login" not in error_text:
+        raise RuntimeError(f"unexpected missing-credential error: {error_text}")
     print("ok")
     return 0
 

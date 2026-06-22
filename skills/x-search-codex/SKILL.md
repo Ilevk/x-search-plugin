@@ -13,15 +13,26 @@ other X mutations. The plugin only supports read-only research.
 
 ## Preconditions
 
-The MCP server needs one credential in the local environment:
+The MCP server needs one usable xAI credential. Prefer local xAI OAuth for
+SuperGrok / X Premium+ accounts:
+
+```bash
+python3 scripts/x_search_auth.py login
+```
+
+The login stores token state under `~/.x-search-codex/auth.json` and the MCP
+server refreshes the access token before X Search calls.
+
+Fallback environment credentials:
 
 - `XAI_OAUTH_BEARER_TOKEN`
 - `XAI_BEARER_TOKEN`
 - `XAI_API_KEY`
 
 If the user asks to authenticate, do not ask them to paste secrets into chat.
-Tell them to put the credential in their local shell, secrets manager, or Codex
-environment. Never read or print local credential files.
+Tell them to run `python3 scripts/x_search_auth.py login` locally, or put a
+fallback credential in their local shell, secrets manager, or Codex environment.
+Never read or print local credential files.
 
 ## Tool Choice
 
@@ -46,8 +57,9 @@ When answering the user:
 
 ## Failure Handling
 
-- Missing credential: ask the user to configure one of the supported env vars.
-- `401`: credential is invalid or expired.
-- `403`: account entitlement or xAI access issue.
+- Missing credential: ask the user to run `python3 scripts/x_search_auth.py login`
+  or configure one of the supported env vars.
+- `401`: credential is invalid or expired; refresh or log in again.
+- `403`: account entitlement or xAI OAuth/API access issue.
 - Timeout: retry once with a narrower query or longer timeout.
 - No citations with filters: treat the result as degraded, not fully sourced.

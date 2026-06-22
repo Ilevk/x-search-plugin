@@ -18,6 +18,8 @@ import urllib.request
 from datetime import date, datetime, timezone
 from typing import Any
 
+import xai_oauth
+
 
 DEFAULT_BASE_URL = "https://api.x.ai/v1"
 DEFAULT_MODEL = "grok-4.20-reasoning"
@@ -32,12 +34,16 @@ class XSearchError(RuntimeError):
     """Raised when xAI `x_search` cannot complete."""
 
 
-def _credential() -> tuple[str | None, str | None]:
-    for name in ("XAI_OAUTH_BEARER_TOKEN", "XAI_BEARER_TOKEN", "XAI_API_KEY"):
-        value = (os.environ.get(name) or "").strip()
-        if value:
-            return value, name
-    return None, None
+def _credential() -> tuple[str | None, str | None, str]:
+    try:
+        resolved = xai_oauth.resolve_credentials()
+    except xai_oauth.XAIAuthError:
+        return None, None, _base_url()
+    return (
+        str(resolved.get("bearer") or "").strip() or None,
+        str(resolved.get("source") or "").strip() or None,
+        str(resolved.get("base_url") or DEFAULT_BASE_URL).strip().rstrip("/"),
+    )
 
 
 def _base_url() -> str:
@@ -203,11 +209,11 @@ def call_x_search(
     if not query:
         raise ValueError("query is required")
 
-    bearer, credential_source = _credential()
+    bearer, credential_source, base_url = _credential()
     if not bearer:
         raise XSearchError(
-            "No xAI credential found. Set XAI_OAUTH_BEARER_TOKEN, "
-            "XAI_BEARER_TOKEN, or XAI_API_KEY in the local environment."
+            "No xAI credential found. Run `python3 scripts/x_search_auth.py login` "
+            "for xAI OAuth, or set XAI_API_KEY."
         )
 
     allowed = _normalize_handles(allowed_x_handles, "allowed_x_handles")
@@ -237,7 +243,7 @@ def call_x_search(
         "store": False,
     }
 
-    endpoint = f"{_base_url()}/responses"
+    endpoint = f"{base_url}/responses"
     last_error: Exception | None = None
     for attempt in range(_retries() + 1):
         try:
@@ -287,10 +293,11 @@ def call_x_search(
 
 
 def x_search_status() -> dict[str, Any]:
-    _bearer, credential_source = _credential()
+    auth_status = xai_oauth.status(refresh_if_expiring=False)
     return {
-        "configured": credential_source is not None,
-        "credential_source": credential_source,
+        "configured": bool(auth_status.get("configured")),
+        "credential_source": auth_status.get("credential_source"),
+        "auth": auth_status,
         "base_url": _base_url(),
         "model": _model(),
         "timeout_seconds": _timeout_seconds(),

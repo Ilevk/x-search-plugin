@@ -11,8 +11,9 @@ It was informed by the following MIT-licensed projects:
   - Copyright (c) 2026 kitepon-rgb
   - Used as a reference for MCP tool shape and X research workflows.
 - `NousResearch/hermes-agent`
-  - Used as a reference for the xAI Responses API `x_search` payload shape.
+  - Used as a reference for the xAI Responses API `x_search` payload shape and
+    xAI OAuth PKCE credential flow.
 
 This implementation does not vendor Hermes Agent and does not read Hermes
 credential files. It calls xAI directly with credentials supplied by the local
-environment.
+OAuth store or environment.
