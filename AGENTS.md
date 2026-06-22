@@ -23,6 +23,8 @@ around browser scraping or X API v2 unless Logan explicitly changes the goal.
   fragments over bare authorization codes.
 - Treat `XAI_BASE_URL` as a credential sink. Do not use real OAuth/API-key
   credentials with untrusted override endpoints.
+- Non-x.ai `XAI_BASE_URL` with env fallback credentials requires
+  `X_SEARCH_ALLOW_UNTRUSTED_BASE_URL=1` and is for local tests only.
 - OAuth state belongs under `~/.x-search-plugin/auth.json` by default, or under
   `X_SEARCH_PLUGIN_HOME` when explicitly set.
 - Legacy `~/.x-search-codex/auth.json` and `X_SEARCH_CODEX_HOME` are supported
@@ -49,7 +51,7 @@ Before committing behavior changes, run:
 
 ```bash
 env PYTHONPYCACHEPREFIX=/tmp/x-search-plugin-pycache \
-  uv run --quiet --locked python -m py_compile scripts/xai_oauth.py scripts/x_search_auth.py scripts/x_search_mcp.py scripts/smoke_mcp.py
+  uv run --quiet --locked python -m py_compile scripts/xai_oauth.py scripts/x_search_auth.py scripts/x_search_mcp.py scripts/smoke_mcp.py plugins/x-search-plugin/scripts/xai_oauth.py plugins/x-search-plugin/scripts/x_search_auth.py plugins/x-search-plugin/scripts/x_search_mcp.py plugins/x-search-plugin/scripts/smoke_mcp.py
 uv run --quiet --locked python scripts/smoke_mcp.py
 ```
 

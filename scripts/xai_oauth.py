@@ -43,6 +43,7 @@ REDIRECT_HOST = "127.0.0.1"
 REDIRECT_PORT = 56121
 REDIRECT_PATH = "/callback"
 REFRESH_SKEW_SECONDS = 3600
+SAFE_OAUTH_ERROR_FIELDS = ("error", "error_description", "message")
 
 
 class XAIAuthError(RuntimeError):
@@ -175,20 +176,38 @@ def _json_request(
         with urllib.request.urlopen(request, timeout=timeout) as response:
             raw = response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace").strip()
         message = f"xAI OAuth HTTP {exc.code}"
+        detail = _safe_oauth_error_detail(exc)
         if detail:
-            message = f"{message}: {detail[:500]}"
+            message = f"{message}: {detail}"
         raise XAIAuthError(message) from exc
     except urllib.error.URLError as exc:
         raise XAIAuthError(f"xAI OAuth request failed: {exc.reason}") from exc
     try:
         payload = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise XAIAuthError(f"xAI OAuth response was not JSON: {raw[:200]!r}") from exc
+        raise XAIAuthError("xAI OAuth response was not valid JSON") from exc
     if not isinstance(payload, dict):
         raise XAIAuthError("xAI OAuth response JSON was not an object")
     return payload
+
+
+def _safe_oauth_error_detail(exc: urllib.error.HTTPError) -> str:
+    body = exc.read().decode("utf-8", errors="replace").strip()
+    if not body:
+        return ""
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError:
+        return "response body omitted"
+    if not isinstance(payload, dict):
+        return "response body omitted"
+    parts = []
+    for field in SAFE_OAUTH_ERROR_FIELDS:
+        value = str(payload.get(field) or "").strip()
+        if value:
+            parts.append(f"{field}={value[:160]}")
+    return "; ".join(parts) if parts else "response body omitted"
 
 
 def _validate_xai_url(url: str) -> None:
@@ -476,7 +495,29 @@ def _base_url_override() -> str:
 
 
 def _env_base_url() -> str:
-    return (os.environ.get("XAI_BASE_URL") or DEFAULT_BASE_URL).strip().rstrip("/")
+    raw = (os.environ.get("XAI_BASE_URL") or DEFAULT_BASE_URL).strip().rstrip("/")
+    parsed = urllib.parse.urlparse(raw)
+    trusted = parsed.scheme == "https" and ((parsed.hostname or "") == "x.ai" or (parsed.hostname or "").endswith(".x.ai"))
+    if raw != DEFAULT_BASE_URL and not trusted and os.environ.get("X_SEARCH_ALLOW_UNTRUSTED_BASE_URL") != "1":
+        raise XAIAuthError(
+            "Refusing to send env fallback credentials to non-x.ai XAI_BASE_URL. "
+            "Set X_SEARCH_ALLOW_UNTRUSTED_BASE_URL=1 only for local tests."
+        )
+    return raw
+
+
+def _auth_store_kind() -> str:
+    configured = os.environ.get("X_SEARCH_PLUGIN_HOME", "").strip()
+    if configured:
+        return "custom"
+    legacy_configured = os.environ.get("X_SEARCH_CODEX_HOME", "").strip()
+    if legacy_configured:
+        return "legacy-custom"
+    default_home = Path.home() / ".x-search-plugin"
+    legacy_home = Path.home() / ".x-search-codex"
+    if not default_home.exists() and legacy_home.exists():
+        return "legacy"
+    return "default"
 
 
 def _jwt_expiry_epoch(token: str) -> int | None:
@@ -608,7 +649,7 @@ def status(*, refresh_if_expiring: bool = False) -> dict[str, Any]:
         "credential_source": credential_source,
         "oauth": {
             "configured": bool(access_token and refresh_token),
-            "store_path": str(auth_path()),
+            "store": _auth_store_kind(),
             "expires_at": exp_iso,
             "refresh_token_present": bool(refresh_token),
             "last_refresh": state.get("last_refresh") if isinstance(state, dict) else None,

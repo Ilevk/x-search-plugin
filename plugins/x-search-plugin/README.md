@@ -37,6 +37,13 @@ Authenticate with xAI OAuth:
 uv run --quiet --locked python scripts/x_search_auth.py login
 ```
 
+For API-key usage instead, skip OAuth and set `XAI_API_KEY` before starting
+Codex:
+
+```bash
+export XAI_API_KEY="..."
+```
+
 Verify protocol wiring:
 
 ```bash
@@ -80,6 +87,13 @@ Authenticate with xAI OAuth:
 uv run --quiet --locked python scripts/x_search_auth.py login
 ```
 
+For API-key usage instead, skip OAuth and set `XAI_API_KEY` before starting
+Claude Code:
+
+```bash
+export XAI_API_KEY="..."
+```
+
 Start Claude Code from the repository root:
 
 ```bash
@@ -115,6 +129,10 @@ Option 2: marketplace-style plugin install from this repository:
 codex plugin marketplace add "$PWD"
 codex plugin add x-search-plugin@x-search-plugin
 ```
+
+Run marketplace commands from the full repository root, where
+`.agents/plugins/marketplace.json` exists. They are not intended to run from an
+installed plugin cache or from `plugins/x-search-plugin/` alone.
 
 For Git-based install, use the repository as a marketplace source:
 
@@ -256,6 +274,8 @@ Search a date range:
 - `X_SEARCH_XAI_OAUTH_CLIENT_ID` overrides the public xAI OAuth client id
 - `X_SEARCH_PLUGIN_DEBUG=1` includes tracebacks in MCP tool errors; the legacy
   `X_SEARCH_CODEX_DEBUG=1` alias is still honored
+- `X_SEARCH_ALLOW_UNTRUSTED_BASE_URL=1` allows env fallback credentials to use
+  a non-x.ai `XAI_BASE_URL`; use only for local tests
 
 ## Troubleshooting
 
@@ -322,7 +342,8 @@ verify with another source.
   fallback after the rename.
 - Use `uv run --quiet --locked python scripts/x_search_auth.py logout` to remove stored OAuth state.
 - Do not set `XAI_BASE_URL` to an untrusted endpoint while using real OAuth or
-  API-key credentials.
+  API-key credentials. Env fallback credentials require
+  `X_SEARCH_ALLOW_UNTRUSTED_BASE_URL=1` before non-x.ai endpoints are allowed.
 - This plugin is read-only. It does not post, like, follow, DM, or mutate X
   account state.
 - The repository does not vendor Hermes and does not read Hermes auth files.
